@@ -9,3 +9,10 @@ terraform.*.tfstate
 # Override 설정 파일 (민감한 변수 또는 설정 파일)
 *.tfvars
 *.tfvars.json
+
+# 람다 zip
+dist
+*.zip
+
+# 테스트 코드
+test*

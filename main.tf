@@ -11,3 +11,8 @@ provider "aws" {
   region = "${var.region}"
   profile = "${var.aws_profile}"
 }
+
+module "lambda" {
+  source = "./lambda"
+  eb_environments = var.eb_environments
+}
