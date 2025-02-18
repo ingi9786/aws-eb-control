@@ -8,11 +8,21 @@ variable "eb_environments" {
 }
 
 variable "lambda_create_eb_arn" {
-  description = "ARN of the Lambda function to be triggered"
+  description = "ARN of create_eb Lambda"
   type        = string
 }
 
 variable "lambda_create_eb_function_name" {
-  description = "Name of the Lambda function to be triggered"
+  description = "Name of create_eb Lambda"
+  type        = string
+}
+
+variable "lambda_delete_eb_arn" {
+  description = "ARN of delete_eb Lambda"
+  type        = string
+}
+
+variable "lambda_delete_eb_function_name" {
+  description = "Name of delete_eb Lambda"
   type        = string
 }
