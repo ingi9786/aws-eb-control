@@ -17,6 +17,7 @@ resource "aws_lambda_function" "create_eb" {
   environment {
     variables = {
       EB_ENVIRONMENTS = jsonencode(var.eb_environments)
+      EB_S3_BUCKET_NAME = var.eb_s3_bucket_name
     }
   }
 }

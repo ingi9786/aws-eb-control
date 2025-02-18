@@ -6,3 +6,7 @@ variable "eb_environments" {
     template_name    = string
   }))
 }
+
+variable "eb_s3_bucket_name" {
+    type = string
+}

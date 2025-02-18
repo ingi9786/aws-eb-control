@@ -17,3 +17,9 @@ variable "eb_environments" {
     template_name    = string
   }))
 }
+
+
+variable "eb_s3_bucket_name" {
+  description = "S3 for archiving eb version labels"
+  type = string 
+}
