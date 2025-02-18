@@ -28,9 +28,12 @@
 - `src/`: Lambda 함수의 소스 코드 저장
   - `create_eb.py`: Elastic Beanstalk 환경 생성을 위한 Python 스크립트
   - `delete_eb.py`: Elastic Beanstalk 환경 삭제를 위한 Python 스크립트
+  - `update_domain.py`: Elastic Beanstalk 환경 도메인 맵핑을 위한 Python 스크립트
 - `lambda/`: Terraform Lambda 모듈
-  - `lam_role.tf`: Lambda 함수에 필요한 IAM 역할과 정책 정의
-  - `create_eb.tf`와 `delete_eb.tf`: 각각 생성과 삭제를 위한 Lambda 함수 리소스 정의
-- `eventbridge/`: Terraform EventBridge
+  - `lam_role.tf`: Lambda 함수에 필요한 공통 IAM 역할과 정책 정의
+  - `create_eb.tf`: EB 생성 Lambda 함수 리소스 정의
+  - `delete_eb.tf`: EB 삭제 Lambda 함수 리소스 정의
+  - `update_domain.tf`: 생성된 EB와 CNAME record 맵핑하는 함수 리소스 정의
+- `eventbridge/`: Terraform EventBridge 모듈
   - `start_eb_weekday.tf`: 평일 아침 EB 환경 시작 규칙
   - `stop_eb_weekday.tf`: 평일 저녁 EB 환경 중지 규칙

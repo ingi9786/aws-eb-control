@@ -23,3 +23,19 @@ variable "eb_s3_bucket_name" {
   description = "S3 for archiving eb version labels"
   type = string 
 }
+
+variable "domain_mappings" {
+  type = map(object({
+    hosted_zone_id = string
+    domains = list(string)
+  }))
+  default = {
+    "project-dev" = {
+      hosted_zone_id = "HOSTING-ID"
+      domains = [
+        "project.example.com",
+        "www.project.example.com"
+      ]
+    }
+  }
+}

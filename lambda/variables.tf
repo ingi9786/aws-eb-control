@@ -10,3 +10,20 @@ variable "eb_environments" {
 variable "eb_s3_bucket_name" {
     type = string
 }
+
+variable "domain_mappings" {
+  description = "Configuration for different projects including hosted zone and target domains"
+  type = map(object({
+    hosted_zone_id = string
+    domains = list(string)
+  }))
+  default = {
+    "project-dev" = {
+      hosted_zone_id = "HOSTING-ID"
+      domains = [
+        "project.example.com",
+        "www.project.example.com"
+      ]
+    }
+  }
+}

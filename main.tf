@@ -16,6 +16,7 @@ module "lambda" {
   source = "./lambda"
   eb_environments = var.eb_environments
   eb_s3_bucket_name = var.eb_s3_bucket_name
+  domain_mappings = var.domain_mappings
 }
 
 module "eventbridge" {
