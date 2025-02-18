@@ -13,3 +13,11 @@ output "delete_eb_arn" {
 output "delete_eb_function_name" {
   value = aws_lambda_function.delete_eb.function_name
 }
+
+output "update_domain_arn" {
+  value = aws_lambda_function.update_domain.arn
+}
+
+output "update_domain_function_name" {
+  value = aws_lambda_function.update_domain.function_name
+}

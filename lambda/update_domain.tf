@@ -39,9 +39,14 @@ resource "aws_iam_role" "update_domain" {
   })
 }
 
-resource "aws_iam_role_policy_attachment" "update_domain_lambda_basic" {
+resource "aws_iam_role_policy_attachment" "update_domain_lambda_basic_exec" {
   role       = aws_iam_role.update_domain.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+resource "aws_iam_role_policy_attachment" "update_domain_eb_readonly" {
+  role       = aws_iam_role.update_domain.name
+  policy_arn = "arn:aws:iam::aws:policy/AWSElasticBeanstalkReadOnly"
 }
 
 resource "aws_iam_role_policy" "update_domain_route53" {
@@ -61,10 +66,4 @@ resource "aws_iam_role_policy" "update_domain_route53" {
       }
     ]
   })
-}
-
-# Elastic Beanstalk 읽기 권한
-resource "aws_iam_role_policy_attachment" "update_domain_eb_readonly" {
-  role       = aws_iam_role.update_domain.name
-  policy_arn = "arn:aws:iam::aws:policy/AWSElasticBeanstalkReadOnly"
 }

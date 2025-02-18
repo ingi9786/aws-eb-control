@@ -22,7 +22,7 @@ resource "aws_cloudwatch_event_target" "lambda_target" {
 
 # 람다 리소스 기반 정책 추가
 # EventBridge가 Lambda를 호출할 수 있는 권한 부여
-resource "aws_lambda_permission" "allow_eventbridge" {
+resource "aws_lambda_permission" "allow_eventbridge_start" {
   statement_id  = "AllowEventBridgeInvoke"
   action        = "lambda:InvokeFunction"
   function_name = var.lambda_create_eb_function_name

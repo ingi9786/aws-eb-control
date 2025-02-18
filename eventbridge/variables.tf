@@ -26,3 +26,13 @@ variable "lambda_delete_eb_function_name" {
   description = "Name of delete_eb Lambda"
   type        = string
 }
+
+variable "lambda_update_domain_arn" {
+  description = "ARN of update_domain Lambda"
+  type        = string
+}
+
+variable "lambda_update_domain_function_name" {
+  description = "Name of update_domain Lambda"
+  type        = string
+}
