@@ -39,3 +39,9 @@ variable "domain_mappings" {
     }
   }
 }
+
+
+variable "waf_web_acl_arn" {
+  description = "ARN of WAF web-acl"
+  type = string 
+}

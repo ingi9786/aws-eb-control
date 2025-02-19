@@ -27,12 +27,12 @@ variable "lambda_delete_eb_function_name" {
   type        = string
 }
 
-variable "lambda_update_domain_arn" {
-  description = "ARN of update_domain Lambda"
+variable "lambda_postdeploy_eb_arn" {
+  description = "ARN of postdeploy_eb Lambda"
   type        = string
 }
 
-variable "lambda_update_domain_function_name" {
-  description = "Name of update_domain Lambda"
+variable "lambda_postdeploy_eb_function_name" {
+  description = "Name of postdeploy_eb Lambda"
   type        = string
 }

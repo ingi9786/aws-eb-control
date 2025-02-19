@@ -27,3 +27,7 @@ variable "domain_mappings" {
     }
   }
 }
+
+variable "waf_web_acl_arn" {
+    type = string
+}

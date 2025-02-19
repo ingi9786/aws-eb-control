@@ -29,11 +29,31 @@ def get_environment_info(eb_client, environment_name: str):
     elb_info = elb_response["LoadBalancers"][0]
     hosted_zone_id = elb_info["CanonicalHostedZoneId"]
     dns_name = elb_info["DNSName"]
+    load_balancer_arn = load_balancer["Name"]
 
     return {
         "domain": dns_name,
         "load_balancer_hosted_zone_id": hosted_zone_id,
+        "load_balancer_arn": load_balancer_arn,
     }
+
+
+def associate_waf_to_alb(wafv2_client, web_acl_arn: str, load_balancer_arn: str):
+    """WAF Web ACL을 Application Load Balancer에 연결"""
+    try:
+        response = wafv2_client.associate_web_acl(
+            WebACLArn=web_acl_arn, ResourceArn=load_balancer_arn
+        )
+        print(
+            f"Successfully associated WAF Web ACL to ALB: {json.dumps(response, default=str)}"
+        )
+        return response
+    except wafv2_client.exceptions.WAFInvalidParameterException:
+        print(f"WAF Web ACL is already associated with the ALB")
+        return None
+    except Exception as e:
+        print(f"Error associating WAF Web ACL to ALB: {str(e)}")
+        raise
 
 
 def update_alias_records(
@@ -72,6 +92,10 @@ def lambda_handler(event, context):
 
         environment_name = event["detail"]["EnvironmentName"]
         domain_mappings_json = os.environ.get("DOMAIN_MAPPINGS", "{}")
+        web_acl_arn = os.environ.get("WAF_WEB_ACL_ARN")
+
+        if not web_acl_arn:
+            raise ValueError("WAF_WEB_ACL_ARN environment variable is not set")
 
         try:
             domain_mappings = json.loads(domain_mappings_json)
@@ -96,6 +120,10 @@ def lambda_handler(event, context):
         eb = boto3.client("elasticbeanstalk")
         env_info = get_environment_info(eb, environment_name)
 
+        # WAF Web ACL 연결
+        wafv2 = boto3.client("wafv2")
+        associate_waf_to_alb(wafv2, web_acl_arn, env_info["load_balancer_arn"])
+
         # Route 53 레코드 업데이트
         route53 = boto3.client("route53")
         update_alias_records(
@@ -113,7 +141,7 @@ def lambda_handler(event, context):
             "statusCode": 200,
             "body": json.dumps(
                 {
-                    "message": f"Successfully updated domains to point to {env_info['domain']}",
+                    "message": f"Successfully updated domains and associated WAF Web ACL",
                     "updated_domains": target_domains,
                 }
             ),
