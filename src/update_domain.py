@@ -70,7 +70,7 @@ def lambda_handler(event, context):
     try:
         print(f"Received event: {json.dumps(event)}")
 
-        environment_name = event["detail"]["EnvironmentName"][0]
+        environment_name = event["detail"]["EnvironmentName"]
         domain_mappings_json = os.environ.get("DOMAIN_MAPPINGS", "{}")
 
         try:
