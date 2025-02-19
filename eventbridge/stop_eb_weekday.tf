@@ -1,7 +1,7 @@
 resource "aws_cloudwatch_event_rule" "stop_eb_daily" {
   name                = "stop-eb-environment-daily"
-  description         = "Stop EB environment every weekday at 7 PM KST"
-  schedule_expression = "cron(0 10 ? * 1-5 *)"  # UTC 10시 = KST 19시
+  description         = "Stop EB environment every weekday at 22 PM KST"
+  schedule_expression = "cron(0 13 ? * MON-FRI *)"
 }
 
 resource "aws_cloudwatch_event_target" "stop_lambda_target" {

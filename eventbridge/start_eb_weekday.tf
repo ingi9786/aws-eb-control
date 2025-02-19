@@ -1,8 +1,8 @@
 # EventBridge 규칙 생성
 resource "aws_cloudwatch_event_rule" "start_eb_daily" {
   name                = "start-eb-environment-daily"
-  description         = "Start EB environment every weekday at 8 AM KST"
-  schedule_expression = "cron(0 23 ? * 1-5 *)"  # UTC 23시 = KST 8시
+  description         = "Start EB environment every weekday at 9 AM KST"
+  schedule_expression = "cron(0 0 ? * MON-FRI *)"
 }
 
 # EventBridge 규칙 target으로 Lambda 함수 연결
