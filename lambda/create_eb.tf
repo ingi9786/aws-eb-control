@@ -12,7 +12,7 @@ resource "aws_lambda_function" "create_eb" {
   handler         = "create_eb.lambda_handler"
   source_code_hash = data.archive_file.create_eb_zip.output_base64sha256
   runtime         = "python3.10"
-  timeout         = 5
+  timeout         = 15
 
   environment {
     variables = {

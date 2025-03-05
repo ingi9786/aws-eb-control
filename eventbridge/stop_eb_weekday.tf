@@ -10,10 +10,7 @@ resource "aws_cloudwatch_event_target" "stop_lambda_target" {
   arn       = var.lambda_delete_eb_arn
 
   input = jsonencode({
-    source = "aws.events"
-    detail = {
-      project_name = keys(var.eb_environments)[0]
-    }
+    environments = keys(var.eb_environments)
   })
 }
 

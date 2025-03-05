@@ -7,7 +7,7 @@ resource "aws_cloudwatch_event_rule" "eb_creation_successful" {
     detail-type = ["Elastic Beanstalk resource status change"]
     detail = {
       Status          = ["Environment creation successful"]
-      EnvironmentName = ["sense-dev"]
+      EnvironmentName = keys(var.eb_environments)
     }
   })
 }

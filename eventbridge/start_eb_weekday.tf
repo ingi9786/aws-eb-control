@@ -11,12 +11,9 @@ resource "aws_cloudwatch_event_target" "lambda_target" {
   target_id = "StartEBEnvironment"
   arn       = var.lambda_create_eb_arn
 
-  # Lambda에 전달할 입력 값
+  # Lambda에 전달할 input 값
   input = jsonencode({
-    source = "aws.events"
-    detail = {
-      project_name = keys(var.eb_environments)[0]
-    }
+    environments = keys(var.eb_environments)
   })
 }
 

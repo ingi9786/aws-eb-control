@@ -4,56 +4,41 @@ import os
 
 
 def get_environment_info(eb_client, environment_name: str):
-    """Elastic Beanstalk 환경 정보 가져오기"""
-    # 환경의 리소스 조회
+    """Elastic Beanstalk 환경의 로드 밸런서 정보를 가져옴"""
     resources = eb_client.describe_environment_resources(
         EnvironmentName=environment_name
     )
-    print(f"Environment Resources: {json.dumps(resources, default=str)}")
 
-    # 환경 리소스: 로드 밸런서 정보 찾기
     if not resources["EnvironmentResources"]["LoadBalancers"]:
         raise Exception(f"No load balancer found for environment {environment_name}")
 
     load_balancer = resources["EnvironmentResources"]["LoadBalancers"][0]
-    print(f"Load Balancer info: {json.dumps(load_balancer, default=str)}")
 
-    # 로드밸런서 host-zone-id와 domain 조회
     elb = boto3.client("elbv2")
     elb_response = elb.describe_load_balancers(LoadBalancerArns=[load_balancer["Name"]])
-    print(f"ELB Response: {json.dumps(elb_response, default=str)}")
 
     if not elb_response["LoadBalancers"]:
-        raise Exception("Load balancer details not found")
+        raise Exception(f"Load balancer details not found for {environment_name}")
 
     elb_info = elb_response["LoadBalancers"][0]
-    hosted_zone_id = elb_info["CanonicalHostedZoneId"]
-    dns_name = elb_info["DNSName"]
-    load_balancer_arn = load_balancer["Name"]
-
     return {
-        "domain": dns_name,
-        "load_balancer_hosted_zone_id": hosted_zone_id,
-        "load_balancer_arn": load_balancer_arn,
+        "domain": elb_info["DNSName"],
+        "load_balancer_hosted_zone_id": elb_info["CanonicalHostedZoneId"],
+        "load_balancer_arn": load_balancer["Name"],
     }
 
 
 def associate_waf_to_alb(wafv2_client, web_acl_arn: str, load_balancer_arn: str):
-    """WAF Web ACL을 Application Load Balancer에 연결"""
+    """WAF(Web ACL)를 ALB에 연결"""
     try:
-        response = wafv2_client.associate_web_acl(
+        wafv2_client.associate_web_acl(
             WebACLArn=web_acl_arn, ResourceArn=load_balancer_arn
         )
-        print(
-            f"Successfully associated WAF Web ACL to ALB: {json.dumps(response, default=str)}"
-        )
-        return response
+        print(f"Successfully associated WAF Web ACL to ALB: {load_balancer_arn}")
     except wafv2_client.exceptions.WAFInvalidParameterException:
         print(f"WAF Web ACL is already associated with the ALB")
-        return None
     except Exception as e:
         print(f"Error associating WAF Web ACL to ALB: {str(e)}")
-        raise
 
 
 def update_alias_records(
@@ -63,7 +48,7 @@ def update_alias_records(
     elb_domain: str,
     elb_hosted_zone_id: str,
 ):
-    """Route 53의 A 레코드 Alias 업데이트"""
+    """Route 53 A 레코드 Alias 업데이트"""
     changes = [
         {
             "Action": "UPSERT",
@@ -80,10 +65,12 @@ def update_alias_records(
         for domain in target_domains
     ]
 
-    response = route53.change_resource_record_sets(
+    route53.change_resource_record_sets(
         HostedZoneId=hosted_zone_id, ChangeBatch={"Changes": changes}
     )
-    return response
+    print(
+        f"Updated Route 53 alias records for {', '.join(target_domains)} -> {elb_domain}"
+    )
 
 
 def lambda_handler(event, context):
@@ -97,12 +84,9 @@ def lambda_handler(event, context):
         if not web_acl_arn:
             raise ValueError("WAF_WEB_ACL_ARN environment variable is not set")
 
-        try:
-            domain_mappings = json.loads(domain_mappings_json)
-        except json.JSONDecodeError:
-            raise ValueError("Invalid DOMAIN_MAPPINGS JSON in environment variable")
-
+        domain_mappings = json.loads(domain_mappings_json)
         project_config = domain_mappings.get(environment_name)
+
         if not project_config:
             raise ValueError(
                 f"No configuration found for environment: {environment_name}"
@@ -134,20 +118,17 @@ def lambda_handler(event, context):
             env_info["load_balancer_hosted_zone_id"],
         )
 
-        print(
-            f"Updated A records with Alias: {', '.join(target_domains)} -> {env_info['domain']}"
-        )
         return {
             "statusCode": 200,
             "body": json.dumps(
                 {
-                    "message": f"Successfully updated domains and associated WAF Web ACL",
+                    "message": "Post-deployment tasks completed successfully",
                     "updated_domains": target_domains,
                 }
             ),
         }
 
     except Exception as e:
-        error_message = f"Error updating domains: {str(e)}"
+        error_message = f"Error in post-deployment tasks: {str(e)}"
         print(f"Error: {error_message}")
         return {"statusCode": 500, "body": json.dumps({"error": error_message})}
